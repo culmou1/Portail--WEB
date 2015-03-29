@@ -34,73 +34,76 @@ function tri (pq) {
 
 io.on('connection', function(socket) {
     console.log('a user connected');
-    //On reçoit le graphe
+
+    //Reçoit le nombre de sommets et la densité et renvoie le JSON du graphe
     socket.on('input_value', function(data) {
-        var valeur = data.split(" "); //valeur[0]=sommets, valeur [1] = densite
+        var valeur = data.split(" "); //valeur[0]=sommets, valeur[1]=densite
         var sommets = valeur[0];
         var densite = valeur[1];
+        //Calcul le nombre total d'arretes en fonction de la densité
         var nb_arretes = Math.round(((sommets*(sommets-1))/2)* (densite/100));
 
         //Creation du JSON de sortie
-        var matrix = [];
-
         var json = {
           nodes: [],
           edges: []
         };
 
+        //Creation de la liste d'ajacence de sortie
+        var adjalist = [];
+
         for (var i = 0; i < sommets; i++) {
           var temp = i.toString();
-          json.nodes.push(temp);
-          matrix[i] = [];
+          json.nodes.push(temp); //Implemente la liste de sommets du JSON
+          adjalist[i] = [];
           for (var v=0; v < sommets; v++) {
-            matrix[i][v]=0;
+            adjalist[i][v]=0;
           }
         }
                 
         var nbedges = 0;
         var min = 0; var max = sommets;
-        var edges = [];
 
         while (nbedges !== nb_arretes) {
+          //Genere aleatoirement des arretes, leur poids (entre 1 et 10) et leur couleur
           var depart = Math.floor(Math.random() * (max- min) + min); var source = depart.toString();
           var dest = Math.floor(Math.random() * (max - min) + min); var target = dest.toString();
           var weight = Math.floor(Math.random()* (10 - 1) + 1); var poids = weight.toString();
           var couleur = getRandomColor();
 
           var temp = [source, target, weight, {color:couleur, label: poids}];
-          var node1 = [dest, weight];
-          var node2 = [depart, weight];
+          var edge1 = [dest, weight];
+          var edge2 = [depart, weight];
           var exist = false;
-          edges.forEach(function(e) {
+          json.edges.forEach(function(e) {
             if (source === e[0] && target === e[1]) exist =true;
             if (source === e[1] && target === e[0]) exist =true;
           });
           if (source === target) exist = true;
           if (!exist) {
-            matrix[depart][dest] = node1;
-            matrix[dest][depart] = node2;
-            json.edges.push(temp)
-            edges.push(temp);
+            adjalist[depart][dest] = edge1; //Implemente la liste d'adjacence
+            adjalist[dest][depart] = edge2;
+            json.edges.push(temp);  //Implemente la liste d'arretes du JSON
             nbedges++;
           }
         }
                 
-        //Envoyer la matrice au browser. Il sera affiche dans la console du browser
-        console.log (matrix);
-        socket.emit ('matrix', matrix);
-        //Envoyer le json au browser. Il sera affiche dans la console du browser
+        //Envoie la liste au browser. Elle sera affiche dans la console du browser
+        socket.emit ('adjalist', adjalist);
+        console.log (adjalist); //affiche dans la console du serveur
+        //Envoie le json au browser. Il sera affiche dans la console du browser
         socket.emit('graph_json', json);
         console.log(json); //affiche dans la console du serveur
     });
     
-    socket.on('matrix_input', function(data) {
+    //Reçoit la liste d'adjacence du graphe et calcul le poids total de son MST
+    socket.on('list_input', function(data) {
       var matrice_prim = data;
 
       var cost = 0;
       var n = matrice_prim.length;
-      var PriorityQueue = [];
-      var visited = [];
+      var PriorityQueue = []; //Liste de priorité
+      var visited = []; //Liste des arretes visitées
       for (var i = 0; i < n; i++) {
         visited[i] = false;
       }
