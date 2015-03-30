@@ -1,10 +1,20 @@
-var app = require('express')();
+var express = require('express');
+var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
+
 
 app.get('/', function(req, res) {
     res.sendfile('index.html');
 });
+
+app.get('/Daehli',function(req,res){
+  res.send("Bonjour sur la page à daehli");
+});
+
+app.use(express.static(__dirname +'/script'));
+/* Maintenant le fichier script dans notre PATH est un serveur */
+/* On peut maintenant faire le lien dans le script. <script type="text/javascript" src="/springy_m.js"></script>
 
 server.listen(8070, function(){
   console.log('listening on localhost:8070');
@@ -60,7 +70,7 @@ io.on('connection', function(socket) {
             adjalist[i][v]=0;
           }
         }
-                
+
         var nbedges = 0;
         var min = 0; var max = sommets;
 
@@ -87,7 +97,7 @@ io.on('connection', function(socket) {
             nbedges++;
           }
         }
-                
+
         //Envoie la liste au browser. Elle sera affiche dans la console du browser
         socket.emit ('adjalist', adjalist);
         console.log (adjalist); //affiche dans la console du serveur
@@ -95,7 +105,7 @@ io.on('connection', function(socket) {
         socket.emit('graph_json', json);
         console.log(json); //affiche dans la console du serveur
     });
-    
+
     //Reçoit la liste d'adjacence du graphe et calcul le poids total de son MST
     socket.on('list_input', function(data) {
       var matrice_prim = data[0];
@@ -128,8 +138,8 @@ io.on('connection', function(socket) {
           for (var i=0; i < json.edges.length; i++) {
             if (curr[0].toString() === json.edges[i][0] && curr[1].toString() === json.edges[i][1]) json.edges[i][3].color = '#000000';
             if (curr[0].toString() === json.edges[i][1] && curr[1].toString() === json.edges[i][0]) json.edges[i][3].color = '#000000';
-          }            
-        
+          }
+
           for (var i=0; i < matrice_prim[curr[1]].length; i++) {
             if (matrice_prim[curr[1]][i] !== 0) {
               PriorityQueue.push (matrice_prim[curr[1]][i]);

@@ -1,5 +1,5 @@
 # Portail--WEB
-Portail 
+Portail
 Le portail permet à l’utilisateur d’utiliser les trois services. Le site doit être fait en XHTML et CSS correct et avoir une belle interface, simple à utiliser.
 Voici un croquis que quelqu’un qui est nul en interfaces ferait. Vous pouvez faire mieux !
 AJAX

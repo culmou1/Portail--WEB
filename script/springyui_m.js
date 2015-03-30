@@ -282,7 +282,7 @@ jQuery.fn.springy = function(params) {
 					angle += Math.PI;
 				}
 				var textPos = s1.add(s2).divide(2).add(normal.multiply(displacement));
-				
+
 				ctx.fillStyle = "#EEEEEE";
 				ctx.fillRect(textPos.x - 20/2, textPos.y, 20, 18);
 
@@ -290,7 +290,7 @@ jQuery.fn.springy = function(params) {
 				ctx.textBaseline = "top";
 				ctx.font = (edge.data.font !== undefined) ? edge.data.font : edgeFont;
 				ctx.fillStyle = (edge.data.color !== undefined) ? edge.data.color : "#000000";
-				
+
 				ctx.translate(textPos.x, textPos.y);
 				ctx.fillText(text, 0,-2);
 				ctx.restore();

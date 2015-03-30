@@ -144,7 +144,7 @@
 			}
 			var weight = e[2];
 			var attr = e[3];
-			
+
 			this.newEdge(node1, node2, weight, attr);
 		}
 	};

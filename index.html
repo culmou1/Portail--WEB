@@ -1,12 +1,23 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Projet Final</title>
-  <link type="text/css" rel="stylesheet" href="stylesheet.css"/>
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
-  <script type="text/javascript" src="springy_m.js"></script>
-  <script type="text/javascript" src="springyui_m.js"></script>
-  <script type="text/javascript" src="node_modules/socket.io/node_modules/socket.io-client/socket.io.js"></script>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-------------- Feuille CSS -------------->
+  <!--<link type="text/css" rel="stylesheet" href="stylesheet.css"/>-->
+  <!-- <script> - tag is used to define a client-side script, such as a JavaScript. -->
+  <!-------------- JQUERY script -------------->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+  <!-------------- BOOTSTRAP -------------->
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+  <!--------------  BIBLIOTHÈQUE -------------->
+  <script type="text/javascript" src="/springy_m.js"></script>
+  <script type="text/javascript" src="/springyui_m.js"></script>
+  <!------------ SOCKET -------------->
+  <script src="https://cdn.socket.io/socket.io-1.3.5.js"></script>
 
 </head>
 <body>
@@ -28,6 +39,7 @@
     <p> Densite: <input id="densite" name="densite">  </p>
 
     <input id="service 1" name="service 1" type="submit" value="Service 1" onclick="service1()" />
+    <input id="service 2" name="service 2" type="submit" value="Service 2" onclick="service2()" />
     <input id="service 3" name="service 3" type="submit" value="Service 3" onclick="service3()" />
     <div id="matrice"></div>
     <div id= "MST"></div>
@@ -36,15 +48,16 @@
   <script>
     var socket;
     var matrice = document.querySelector("#matrice");
-    var adjalist; var graphJSON;
+    var adjalist;
+    var graphJSON;
     var mst = document.querySelector("#MST");
     var viz = document.querySelector('#viz');
 
     function creerSocket() {
-      
+
       socket = io.connect('http://localhost:8070');
 
-      //Reçoit le JSON du graphe et l'affiche sur l'HTML avec Springy 
+      //Reçoit le JSON du graphe et l'affiche sur l'HTML avec Springy
       //et dans la console
       socket.on('graph_json', function (data) {
         graphJSON = data;
@@ -56,7 +69,7 @@
 
           var springy = jQuery('#springy_canvas').springy({graph: graph});
         });
-      }); 
+      });
 
       //Reçoit la liste d'adjacence et l'affiche sur l'HTML et la console
       socket.on ('adjalist', function (data) {
@@ -107,6 +120,13 @@
       var s = sommets + " " + densite;
       socket.emit('input_value', s);
     }
+    function service2() {
+      //Check si le socket existe avant...
+      if (typeof socket == 'undefined') {
+        creerSocket();
+        service2();
+      }
+    }
 
     //Calcul le poids total du MST
     function service3() {
@@ -119,13 +139,13 @@
       //Envoie la liste d'adjacence à l'algo de Prim
       socket.emit('list_input', input);
     }
-           
+
     function fermer() {
     }
 
 
   </script>
-  
+
 </div>
 </body>
 </html>
