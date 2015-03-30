@@ -145,6 +145,12 @@
 			var weight = e[2];
 			var attr = e[3];
 			
+			if (attr.color === "#000000") {
+				this.nodes.forEach(function(n){
+					n.data.color = "#FFFFFF";
+				});
+			}
+
 			this.newEdge(node1, node2, weight, attr);
 		}
 	};
