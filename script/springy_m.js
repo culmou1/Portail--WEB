@@ -144,6 +144,15 @@
 			}
 			var weight = e[2];
 			var attr = e[3];
+<<<<<<< HEAD:script/springy_m.js
+=======
+			
+			if (attr.color === "#000000") {
+				this.nodes.forEach(function(n){
+					n.data.color = "#FFFFFF";
+				});
+			}
+>>>>>>> origin/master:springy_m.js
 
 			this.newEdge(node1, node2, weight, attr);
 		}
