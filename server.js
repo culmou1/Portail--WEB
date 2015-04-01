@@ -3,19 +3,19 @@ var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 
-<<<<<<< HEAD
 
 app.get('/', function(req, res) {
     res.sendfile('index.html');
 });
-=======
 app.use (express.static (__dirname + '/graph'));
->>>>>>> origin/master
 
 app.get('/Daehli',function(req,res){
   res.send("Bonjour sur la page à daehli");
 });
 
+app.get('/Martine',function(req,res){
+  res.send("Salut Martine, tu est maintenant sur nôtre site");
+});
 app.use(express.static(__dirname +'/script'));
 /* Maintenant le fichier script dans notre PATH est un serveur */
 /* On peut maintenant faire le lien dans le script. <script type="text/javascript" src="/springy_m.js"></script>*/
