@@ -5,17 +5,21 @@ var io = require('socket.io')(server);
 
 
 app.get('/', function(req, res) {
+    res.sendfile('home.html');
+});
+
+app.get('/home', function(req, res) {
+    res.sendfile('home.html');
+});
+
+app.get('/services', function(req, res) {
     res.sendfile('index.html');
 });
-app.use (express.static (__dirname + '/graph'));
 
 app.get('/Daehli',function(req,res){
   res.send("Bonjour sur la page à daehli");
 });
 
-app.get('/Martine',function(req,res){
-  res.send("Salut Martine, tu est maintenant sur nôtre site");
-});
 app.use(express.static(__dirname +'/script'));
 /* Maintenant le fichier script dans notre PATH est un serveur */
 /* On peut maintenant faire le lien dans le script. <script type="text/javascript" src="/springy_m.js"></script>*/
@@ -36,7 +40,7 @@ function getRandomColor () {
 function tri (pq) {
     for(var d=pq.length; d > 0; d--) {
       for(var i=0; i<d-1; i++) {
-          if(pq[i][2] < pq[i+1][2]) {
+          if(pq[i].poids < pq[i+1].poids) {
               var tmp= pq[i];
               pq[i]=pq[i+1];
               pq[i+1]=tmp;
@@ -65,13 +69,16 @@ io.on('connection', function(socket) {
 
         //Creation de la liste d'ajacence de sortie
         var adjalist = [];
+        var matrix = [];
 
         for (var i = 0; i < sommets; i++) {
           var temp = i.toString();
           json.nodes.push(temp); //Implemente la liste de sommets du JSON
           adjalist[i] = [];
+          matrix[i] = [];
           for (var v=0; v < sommets; v++) {
             adjalist[i][v]=0;
+            matrix[i][v] = 0;
           }
         }
 
@@ -86,8 +93,8 @@ io.on('connection', function(socket) {
           var couleur = getRandomColor();
 
           var temp = [source, target, weight, {color:couleur, label: poids}];
-          var edge1 = [depart, dest, weight];
-          var edge2 = [dest, depart, weight];
+          var edge1 = {depart :depart, dest: dest, poids: weight};
+          var edge2 = {depart :dest, dest: depart, poids: weight};
           var exist = false;
           json.edges.forEach(function(e) {
             if (source === e[0] && target === e[1]) exist =true;
@@ -97,11 +104,17 @@ io.on('connection', function(socket) {
           if (!exist) {
             adjalist[depart][dest] = edge1; //Implemente la liste d'adjacence
             adjalist[dest][depart] = edge2;
+
+            matrix[depart][dest] = weight;
+            matrix[dest][depart] = weight;
             json.edges.push(temp);  //Implemente la liste d'arretes du JSON
             nbedges++;
           }
         }
 
+        //Envoie la matrice au browser. Elle sera affiche dans la console du browser
+        socket.emit ('matrix', matrix);
+        console.log (matrix); //affiche dans la console du serveur
         //Envoie la liste au browser. Elle sera affiche dans la console du browser
         socket.emit ('adjalist', adjalist);
         console.log (adjalist); //affiche dans la console du serveur
@@ -133,20 +146,20 @@ io.on('connection', function(socket) {
       while (PriorityQueue.length !== 0 && inTree < n) {
         var curr = PriorityQueue [PriorityQueue.length-1]; //curr [0] = index, curr[1]= weight
         PriorityQueue.pop();
-        if (!visited[curr[1]]) {
+        if (!visited[curr.dest]) {
           inTree++;
-          visited[curr[1]] = true;
-          cost += curr[2];
+          visited[curr.dest] = true;
+          cost += curr.poids;
 
 
           for (var i=0; i < json.edges.length; i++) {
-            if (curr[0].toString() === json.edges[i][0] && curr[1].toString() === json.edges[i][1]) json.edges[i][3].color = '#000000';
-            if (curr[0].toString() === json.edges[i][1] && curr[1].toString() === json.edges[i][0]) json.edges[i][3].color = '#000000';
+            if (curr.depart.toString() === json.edges[i][0] && curr.dest.toString() === json.edges[i][1]) json.edges[i][3].color = '#000000';
+            if (curr.depart.toString() === json.edges[i][1] && curr.dest.toString() === json.edges[i][0]) json.edges[i][3].color = '#000000';
           }
 
-          for (var i=0; i < matrice_prim[curr[1]].length; i++) {
-            if (matrice_prim[curr[1]][i] !== 0) {
-              PriorityQueue.push (matrice_prim[curr[1]][i]);
+          for (var i=0; i < matrice_prim[curr.dest].length; i++) {
+            if (matrice_prim[curr.dest][i] !== 0) {
+              PriorityQueue.push (matrice_prim[curr.dest][i]);
             }
           }
           PriorityQueue = tri(PriorityQueue);
@@ -157,4 +170,44 @@ io.on('connection', function(socket) {
     socket.emit('prim', output);
     console.log (cost);
   });
+
+function djistra (adjalist, start, end) {
+  var n = adjalist.length;
+  var PriorityQueue = []; //Liste de priorité
+    var visited = []; //Liste des arretes visitées
+    for (var i = 0; i < n; i++) {
+        visited[i] = false;
+    }
+    PriorityQueue.push ({index :start, poids :0});
+    while (!visited[end] && PriorityQueue.length !== 0) {
+      var curr = PriorityQueue [PriorityQueue.length-1]; //curr [0] = index, curr[1]= weight / prend le dernier et unique
+        PriorityQueue.pop();
+        if (!visited[curr.index]) {
+          visited[curr.index] = true;
+          if (curr.index === end)
+            return curr.poids;
+          for (var i =0; i<n; i++) {
+            if (adjalist[curr.index][i] >0 && !visited[i]) {
+              var newWeight = curr.poids + adjalist[curr.index][i];
+              PriorityQueue.push ({index :i, poids :newWeight});
+            }
+          }
+          PriorityQueue = tri(PriorityQueue);
+      } 
+  }
+}
+
+ socket.on('dijkstra', function(data) { //data  = [matrice, debut]
+  var adjalist = data[0];
+  var start = data[1];
+  var tout_chemin = [];
+  for (var v=0; v < adjalist.length; v++) {
+    if (v !== start) {
+    var i = djistra (adjalist, start, v);
+    tout_chemin.push(i);
+    }
+  }
+  socket.emit('dijkstra_output', tout_chemin);
+    console.log (tout_chemin);
+ });
 });
