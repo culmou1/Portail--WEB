@@ -1,56 +1,116 @@
-<!DOCTYPE html>
-<html>
 
+<!DOCTYPE html>
 <head>
-  <title>Projet Final</title>
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-------------- Feuille CSS -------------->
-  <!--<link type="text/css" rel="stylesheet" href="stylesheet.css"/>
-  <script> - tag is used to define a client-side script, such as a JavaScript.-->
-  <!-------------- JQUERY script -------------->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-  <!-------------- BOOTSTRAP -------------->
-  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-  <!--------------  BIBLIOTHÈQUE -------------->
-  <script type="text/javascript" src="/springy_m.js"></script>
+    <title> Test </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
+    <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<link href="screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+
+<script type="text/javascript" src="/springy_m.js"></script>
   <script type="text/javascript" src="/springyui_m.js"></script>
   <!------------ SOCKET -------------->
   <script src="https://cdn.socket.io/socket.io-1.3.5.js"></script>
+  <style type="text/css">
+      body { 
+        background: #eeeeee;
+      }
 
+      #main {
+        position: relative;
+        padding: 30px 30px 10px 10px;
+        overflow: auto;
+
+      }
+
+      #viz {
+        width:960px;
+        height:450px;
+        margin-right: 100px;
+        overflow: hidden;
+        background-color: #eeeeee;
+        cursor: crosshair;
+        float: right;
+      }
+      
+      #formulaire {
+        margin-top: 50px;
+        margin-left: 100px;
+        margin-right: 10px;
+        float: left;
+      }
+  </style>
 </head>
 <body>
-  <div id="header">
-  <!---<a id="home" href="accuel">-->
-    <span id="home"> Accueil </span>
-    <span id="title">
-      Service 1
-      Service 2
-      Service 3
-    </span>
-  </div>
-  <div id="left-bar"></div>
-  <div id="right-bar"></div>
-  <div id="bottom-bar"></div>
-  <div id="main">
-  <div id='formulaire'>
-    <p> Sommets: <input id="sommets" name="sommets"> </p>
-    <p> Densite: <input id="densite" name="densite">  </p>
+<div id="wrap">
+    <header role="banner">
+    <nav class="navbar navbar-default" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/home">Accueil</a>
+        </div>
 
-    <input id="service 1" name="service 1" type="submit" value="Service 1" onclick="service1()" />
-    <input id="service 2" name="service 2" type="submit" value="Service 2" onclick="service2()" />
-    <input id="service 3" name="service 3" type="submit" value="Service 3" onclick="service3()" />
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"> Generateur <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <p> Sommets: <input id="sommets" name="sommets"> </p>
+                            <p> Densite: <input id="densite" name="densite"> </p>
+                            <input id="service1" name="service 1" type="submit" value="Generer" onclick="service1()" />
+                        </li>
+                    </ul>
+                </li>
+                <li >
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"> Dijkstra <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <p> Point de départ: <input id="start" name="start"> </p>
+                            <input id="service2" name="service 2" type="submit" value="Calculer" onclick="service2()" />
+                        </li>
+                    </ul>
+
+                </li>
+                <li>
+                    <a href="#" id="service3" onclick="service3()"> M.S.T </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    </nav>
+    </header>
+</div>
+<div id="main">
+  <div id='formulaire'>
     <div id="matrice"></div>
+    <div id="SSPT"></div>
     <div id= "MST"></div>
   </div>
   <div id="viz"> </div>
   <script>
     var socket;
     var matrice = document.querySelector("#matrice");
+    var djistra;
+    var debut;
     var adjalist;
     var graphJSON;
     var mst = document.querySelector("#MST");
+    var sspt = document.querySelector("#SSPT");
     var viz = document.querySelector('#viz');
 
     function creerSocket() {
@@ -80,12 +140,17 @@
           var liste = "<p><b>" + i + ": </b>";
           for (var v=0; v <adjalist.length; v++) {
             if (adjalist[i][v] !== 0) {
-              liste += "[" + adjalist[i][v] + "] ";
+              liste += "[" + adjalist[i][v].dest+ ','+ adjalist[i][v].poids + "] ";
             }
           }
           liste += "</p>";
           matrice.innerHTML += liste;
         }
+      });
+
+      socket.on ('matrix', function (data) {
+        djistra = data;
+        console.log(djistra);
       });
 
       //Reçoit le poids total du MST et l'affiche sur l'HTML et la console
@@ -104,6 +169,17 @@
           var springy = jQuery('#springy_canvas').springy({graph: graph});
         });
       });
+
+      socket.on ('dijkstra_output', function (data) {
+        console.log (data);
+        sspt.innerHTML = "<h3> Dijkstra :</h3>";
+        for (var i = 0; i < adjalist.length; i++) {
+          if (i !== parseInt(debut)) {
+            var path = "<p><b>" + debut + "->" + i + "</b> : " + data[i] + "</p>";
+            sspt.innerHTML += path;
+          }
+        }
+      });
     }
 
     //Genere le graphe
@@ -120,12 +196,16 @@
       var s = sommets + " " + densite;
       socket.emit('input_value', s);
     }
+
     function service2() {
       //Check si le socket existe avant...
       if (typeof socket == 'undefined') {
         creerSocket();
         service2();
       }
+      debut = document.querySelector("#start").value;
+      var input = [djistra, debut];
+      socket.emit('dijkstra', input);
     }
 
     //Calcul le poids total du MST
@@ -145,7 +225,20 @@
 
 
   </script>
-
+<script>
+var clicked = false;
+var clicked2 = false;
+$('#service1').click(function() { clicked = true });
+$('#service2').click(function() { clicked2 = true });
+$('ul.dropdown-menu').on('click', function(event){
+    // The event won't be propagated up to the document NODE and 
+    // therefore delegated events won't be fired
+    if (!clicked)
+    event.stopPropagation();
+  if (!clicked2)
+    event.stopPropagation();
+});
+</script>
 </div>
 </body>
 </html>
