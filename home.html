@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<head>
+    <title> Test </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
+    <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<link href="screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+
+<script type="text/javascript" src="/springy_m.js"></script>
+  <script type="text/javascript" src="/springyui_m.js"></script>
+  <!------------ SOCKET -------------->
+  <script src="https://cdn.socket.io/socket.io-1.3.5.js"></script>
+  <style type="text/css">
+      body { 
+        background: #eeeeee;
+      }
+
+      #main {
+        position: relative;
+        padding: 30px 30px 10px 10px;
+        overflow: auto;
+
+      }
+
+      #viz {
+        width:960px;
+        height:450px;
+        margin-right: 100px;
+        overflow: hidden;
+        background-color: #eeeeee;
+        cursor: crosshair;
+        float: right;
+      }
+      
+      #formulaire {
+        margin-top: 50px;
+        margin-left: 100px;
+        margin-right: 10px;
+        float: left;
+      }
+  </style>
+</head>
+<body>
+<div id="wrap">
+    <header role="banner">
+    <nav class="navbar navbar-default" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Accueil</a>
+        </div>
+
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"> Generateur <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <p> Sommets: <input id="sommets" name="sommets"> </p>
+                            <p> Densite: <input id="densite" name="densite"> </p>
+                            <input id="service1" name="service 1" type="submit" value="Generer" onclick="service1()" />
+                        </li>
+                    </ul>
+                </li>
+                <li >
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"> Dijkstra <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <p> Point de départ: <input id="start" name="start"> </p>
+                            <input id="service2" name="service 2" type="submit" value="Calculer" onclick="service2()" />
+                        </li>
+                    </ul>
+
+                </li>
+                <li>
+                    <a href="#" id="service3" onclick="service3()"> M.S.T </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    </nav>
+    </header>
+</div>
+<div id="main">
+    <h1> Service 1 </h1>
+    <p> blblbl </p>
+    <h1> Service 2 </h1>
+    <p> piohnohsqon </p>
+    <h1> Service 3 </h1>
+    <p> yfgdsygdsgd </p>
+    <button type="button" class="btn btn-danger"> <a href="/services"> Go B**CH ! </a></button>
+</div>
+</body>
+</html>
