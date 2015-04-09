@@ -283,7 +283,7 @@ jQuery.fn.springy = function(params) {
 				}
 				var textPos = s1.add(s2).divide(2).add(normal.multiply(displacement));
 
-				ctx.fillStyle = "#EEEEEE";
+				ctx.fillStyle = "#FFFFFF";
 				ctx.fillRect(textPos.x - 20/2, textPos.y, 20, 18);
 
 				ctx.textAlign = "center";
@@ -323,7 +323,7 @@ jQuery.fn.springy = function(params) {
 			} else if (nearest !== null && nearest.node !== null && nearest.node.id === node.id && node.data.color === "#FFFFFF") {
 				ctx.fillStyle = "#000000";
 			} else if (nearest !== null && nearest.node !== null && nearest.node.id === node.id) {
-				ctx.fillStyle = "#EEEEEE";
+				ctx.fillStyle = "#FFFFFF";
 			} else if (node.data.color === "#FFFFFF") {
 				ctx.fillStyle = "#000000";
 			} else {
