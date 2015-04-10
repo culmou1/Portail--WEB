@@ -28,6 +28,7 @@ server.listen(8070, function(){
   console.log('listening on localhost:8070');
 });
 
+//Genere des couleurs aléatoirement
 function getRandomColor () {
     var letters = '0123456789ABCDEF'.split('');
     var color = '#';
@@ -37,6 +38,7 @@ function getRandomColor () {
     return color;
 }
 
+//Tri la PriorityQueue en decroissant
 function tri (pq) {
     for(var d=pq.length; d > 0; d--) {
       for(var i=0; i<d-1; i++) {
@@ -61,66 +63,69 @@ io.on('connection', function(socket) {
         //Calcul le nombre total d'arretes en fonction de la densité
         var nb_arretes = Math.round(((sommets*(sommets-1))/2)* (densite/100));
 
-        //Creation du JSON de sortie
-        var json = {
-          nodes: [],
-          edges: []
-        };
+        if (nb_arretes >= sommets-1) {
+          //Creation du JSON de sortie
+          var json = {
+            nodes: [],
+            edges: []
+          };
 
-        //Creation de la liste d'ajacence de sortie
-        var adjalist = [];
-        var matrix = [];
+          //Creation de la liste d'ajacence de sortie
+          var adjalist = [];
+          var matrix = [];
 
-        for (var i = 0; i < sommets; i++) {
-          var temp = i.toString();
-          json.nodes.push(temp); //Implemente la liste de sommets du JSON
-          adjalist[i] = [];
-          matrix[i] = [];
-          for (var v=0; v < sommets; v++) {
-            adjalist[i][v]=0;
-            matrix[i][v] = 0;
+          for (var i = 0; i < sommets; i++) {
+            var temp = i.toString();
+            json.nodes.push(temp); //Implemente la liste de sommets du JSON
+            adjalist[i] = []; // Creer un vecteur pour chaque noeud
+            matrix[i] = [];
+            for (var v=0; v < sommets; v++) {
+              adjalist[i][v]=0;
+              matrix[i][v] = 0;
+            }
           }
-        }
 
-        var nbedges = 0;
-        var min = 0; var max = sommets;
+          var nbedges = 0;
+          var min = 0; var max = sommets;
 
-        while (nbedges !== nb_arretes) {
-          //Genere aleatoirement des arretes, leur poids (entre 1 et 10) et leur couleur
-          var depart = Math.floor(Math.random() * (max- min) + min); var source = depart.toString();
-          var dest = Math.floor(Math.random() * (max - min) + min); var target = dest.toString();
-          var weight = Math.floor(Math.random()* (10 - 1) + 1); var poids = weight.toString();
-          var couleur = getRandomColor();
+          while (nbedges !== nb_arretes) {
+            //Genere aleatoirement des arretes, leur poids (entre 1 et 10) et leur couleur
+            var depart = Math.floor(Math.random() * (max- min) + min); var source = depart.toString();
+            var dest = Math.floor(Math.random() * (max - min) + min); var target = dest.toString();
+            var weight = Math.floor(Math.random()* (10 - 1) + 1); var poids = weight.toString();
+            var couleur = getRandomColor();
 
-          var temp = [source, target, weight, {color:couleur, label: poids}];
-          var edge1 = {depart :depart, dest: dest, poids: weight};
-          var edge2 = {depart :dest, dest: depart, poids: weight};
-          var exist = false;
-          json.edges.forEach(function(e) {
-            if (source === e[0] && target === e[1]) exist =true;
-            if (source === e[1] && target === e[0]) exist =true;
-          });
-          if (source === target) exist = true;
-          if (!exist) {
-            adjalist[depart][dest] = edge1; //Implemente la liste d'adjacence
-            adjalist[dest][depart] = edge2;
+            var temp = [source, target, weight, {color:couleur, label: poids}];
+            var edge1 = {depart :depart, dest: dest, poids: weight};
+            var edge2 = {depart :dest, dest: depart, poids: weight};
+            var exist = false;
+            json.edges.forEach(function(e) {
+              if (source === e[0] && target === e[1]) exist =true;
+              if (source === e[1] && target === e[0]) exist =true;
+            });
+            if (source === target) exist = true;
+            if (!exist) {
+              adjalist[depart][dest] = edge1; //Implemente la liste d'adjacence
+              adjalist[dest][depart] = edge2;
 
-            matrix[depart][dest] = weight;
-            matrix[dest][depart] = weight;
-            json.edges.push(temp);  //Implemente la liste d'arretes du JSON
-            nbedges++;
+              matrix[depart][dest] = weight;
+              matrix[dest][depart] = weight;
+              json.edges.push(temp);  //Implemente la liste d'arretes du JSON
+              nbedges++;
+            }
           }
-        }
 
-        //Envoie la matrice au browser. Elle sera affiche dans la console du browser
-        socket.emit ('matrix', matrix);
-        console.log (matrix); //affiche dans la console du serveur
-        //Envoie la liste au browser. Elle sera affiche dans la console du browser
-        socket.emit ('adjalist', adjalist);
-        console.log (adjalist); //affiche dans la console du serveur
-        //Envoie le json au browser. Il sera affiche dans la console du browser
-        socket.emit('graph_json', json);
-        console.log(json); //affiche dans la console du serveur
+          //Envoie la matrice au browser. Elle sera affiche dans la console du browser
+          socket.emit ('matrix', matrix);
+          console.log (matrix); //affiche dans la console du serveur
+          //Envoie la liste au browser. Elle sera affiche dans la console du browser
+          socket.emit ('adjalist', adjalist);
+          console.log (adjalist); //affiche dans la console du serveur
+          //Envoie le json au browser. Il sera affiche dans la console du browser
+          socket.emit('graph_json', json);
+          console.log(json); //affiche dans la console du serveur
+        }
+        else socket.emit ('alerte', "");
     });
 
     //Reçoit la liste d'adjacence du graphe et calcul le poids total de son MST
@@ -171,39 +176,39 @@ io.on('connection', function(socket) {
     console.log (cost);
   });
 
-function djistra (adjalist, start, end) {
-  var n = adjalist.length;
+function dijkstra (matrice_adj, start, end) {
+  var n = matrice_adj.length;
   var PriorityQueue = []; //Liste de priorité
-    var visited = []; //Liste des arretes visitées
-    for (var i = 0; i < n; i++) {
-        visited[i] = false;
-    }
-    PriorityQueue.push ({index :start, poids :0});
-    while (!visited[end] && PriorityQueue.length !== 0) {
-      var curr = PriorityQueue [PriorityQueue.length-1]; //curr [0] = index, curr[1]= weight / prend le dernier et unique
-        PriorityQueue.pop();
-        if (!visited[curr.index]) {
-          visited[curr.index] = true;
-          if (curr.index === end)
-            return curr.poids;
-          for (var i =0; i<n; i++) {
-            if (adjalist[curr.index][i] >0 && !visited[i]) {
-              var newWeight = curr.poids + adjalist[curr.index][i];
-              PriorityQueue.push ({index :i, poids :newWeight});
-            }
-          }
-          PriorityQueue = tri(PriorityQueue);
-      } 
+  var visited = []; //Liste des arretes visitées
+  for (var i = 0; i < n; i++) {
+      visited[i] = false;
+  }
+  PriorityQueue.push ({index :start, poids :0});
+  while (!visited[end] && PriorityQueue.length !== 0) {
+    var curr = PriorityQueue [PriorityQueue.length-1]; //curr [0] = index, curr[1]= weight / prend le dernier et unique
+    PriorityQueue.pop();
+    if (!visited[curr.index]) {
+      visited[curr.index] = true;
+      if (curr.index === end)
+        return curr.poids;
+      for (var i =0; i<n; i++) {
+        if (matrice_adj[curr.index][i] >0 && !visited[i]) {
+          var newWeight = curr.poids + matrice_adj[curr.index][i];
+          PriorityQueue.push ({index :i, poids :newWeight});
+        }
+      }
+      PriorityQueue = tri(PriorityQueue);
+    } 
   }
 }
 
- socket.on('dijkstra', function(data) { //data  = [matrice, debut]
-  var adjalist = data[0];
+socket.on('dijkstra', function(data) { //data  = [matrice, debut]
+  var matrice_adj = data[0];
   var start = data[1];
   var tout_chemin = [];
-  for (var v=0; v < adjalist.length; v++) {
+  for (var v=0; v < matrice_adj.length; v++) {
     if (v !== start) {
-    var i = djistra (adjalist, start, v);
+    var i = dijkstra (matrice_adj, start, v);
     tout_chemin.push(i);
     }
   }
