@@ -12,15 +12,12 @@ app.get('/home', function(req, res) {
     res.sendfile('home.html');
 });
 
-app.get('/accueil', function(req, res) {
-    res.sendfile('home.html');
-});
 app.get('/services', function(req, res) {
     res.sendfile('index.html');
 });
 
-app.get('/foo',function(req,res){
-  res.sendfile('foo.html');
+app.get('/Daehli',function(req,res){
+  res.send("Bonjour sur la page à daehli");
 });
 
 app.use(express.static(__dirname +'/script'));
@@ -182,7 +179,6 @@ io.on('connection', function(socket) {
 function dijkstra (matrice_adj, start, end) {
   var n = matrice_adj.length;
   var PriorityQueue = []; //Liste de priorité
-<<<<<<< Updated upstream
   var visited = []; //Liste des arretes visitées
   for (var i = 0; i < n; i++) {
       visited[i] = false;
@@ -203,28 +199,6 @@ function dijkstra (matrice_adj, start, end) {
       }
       PriorityQueue = tri(PriorityQueue);
     } 
-=======
-    var visited = []; //Liste des arretes visitées
-    for (var i = 0; i < n; i++) {
-        visited[i] = false;
-    }
-    PriorityQueue.push ({index :start, poids :0});
-    while (!visited[end] && PriorityQueue.length !== 0) {
-      var curr = PriorityQueue [PriorityQueue.length-1]; //curr [0] = index, curr[1]= weight / prend le dernier et unique
-        PriorityQueue.pop();
-        if (!visited[curr.index]) {
-          visited[curr.index] = true;
-          if (curr.index === end)
-            return curr.poids;
-          for (var i =0; i<n; i++) {
-            if (adjalist[curr.index][i] >0 && !visited[i]) {
-              var newWeight = curr.poids + adjalist[curr.index][i];
-              PriorityQueue.push ({index :i, poids :newWeight});
-            }
-          }
-          PriorityQueue = tri(PriorityQueue);
-      }
->>>>>>> Stashed changes
   }
 }
 
@@ -234,13 +208,8 @@ socket.on('dijkstra', function(data) { //data  = [matrice, debut]
   var tout_chemin = [];
   for (var v=0; v < matrice_adj.length; v++) {
     if (v !== start) {
-<<<<<<< Updated upstream
     var i = dijkstra (matrice_adj, start, v);
     tout_chemin.push(i);
-=======
-    var i = djistra (adjalist, start, v);
-    tout_chemin.push(i);u
->>>>>>> Stashed changes
     }
   }
   socket.emit('dijkstra_output', tout_chemin);
