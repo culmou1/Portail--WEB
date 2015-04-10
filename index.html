@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <head>
     <title> Test </title>
@@ -21,7 +20,7 @@
   <!------------ SOCKET -------------->
   <script src="https://cdn.socket.io/socket.io-1.3.5.js"></script>
   <style type="text/css">
-      body { 
+      body {
         padding : 20px;
       }
       .container-narrow {
@@ -40,9 +39,26 @@
         cursor: crosshair;
         float: both;
       }
+<<<<<<< Updated upstream
       #alert {
         visibility:hidden;
+=======
+      .jumbotron {
+      margin: 5px 0;
+      text-align: center;
+      background-color:white;
       }
+    .jumbotron h1 {
+      font-size: 72px;
+      line-height: 1;
+      font-weight: bold;
+>>>>>>> Stashed changes
+      }
+    .jumbotron .btn {
+      font-size: 21px;
+      padding: 14px 24px;
+      }
+
   </style>
 </head>
 <body>
@@ -71,16 +87,32 @@
         <li>
           <a href="#" id="service3" class="dropdown-toggle" data-toggle="dropdown" onclick="service3()"> M.S.T <b class="caret"></b></a>
           <ul class="dropdown-menu">
-              <li><p> *** FAKE **** </p></li>
+              <li><p> **** FAKE **** </p></li>
           </ul>
         </li>
     </ul>
     <h3 class="text-muted"><a id="projet" href="/home"> <span class="glyphicon glyphicon-home" aria-hidden="true"> </span> Accueil</a></h3>
     <hr>
+<<<<<<< Updated upstream
     <div class="alert alert-danger" role="alert" id="alert"> Oups ! Error 69   <span class="glyphicon glyphicon-retweet" aria-hidden="true"> </span>  le graphe is disconnected</div>
     <div id="matrice"></div>
     <div id="SSPT"></div>
     <div id= "MST"></div>
+=======
+  <div class="container-fluid">
+    <div id="row">
+      <div class="col-md-4">
+        <p id="matrice"></p>
+      </div>
+      <div class="col-md-4">
+        <p id="SSPT"></p>
+      </div>
+      <div class="col-md-4">
+        <p id= "MST"></p>
+      </div>
+    </div>
+  </div>
+>>>>>>> Stashed changes
   <div id="viz"> </div>
   <script>
     var socket;
@@ -124,7 +156,7 @@
         matrice.innerHTML = "<h3>Liste d'Adjacence: </h3>";
         for (var i = 0; i < adjalist.length; i++) {
           var liste = "<p><b>" + i + ": </b>";
-          for (var v=0; v <adjalist.length; v++) {
+          for (var v = 0; v < adjalist.length; v++) {
             if (adjalist[i][v] !== 0) {
               liste += "[" + adjalist[i][v].dest+ ','+ adjalist[i][v].poids + "] ";
             }
@@ -145,7 +177,7 @@
       socket.on ('prim', function (data) {
         cost = data[0];
         console.log (cost);
-        mst.innerHTML = "<h3>MST: </h3>";
+        mst.innerHTML = "<h3> MST: </h3>";
         mst.innerHTML += "<p>"+ cost + "</p>";
         graphJSON = data[1];
         viz.innerHTML = "<canvas id=\"springy_canvas\" width=\"960\" height=\"450\" />";
@@ -214,6 +246,7 @@
 
 
   </script>
+<<<<<<< Updated upstream
   <script>
     var clicked = false;
     var clicked2 = false;
@@ -228,6 +261,22 @@
           event.stopPropagation();
     });
   </script>
+=======
+<script>
+var clicked = false;
+var clicked2 = false;
+$('#service1').click(function() { clicked = true });
+$('#service2').click(function() { clicked2 = true });
+$('ul.dropdown-menu').on('click', function(event){
+    // The event won't be propagated up to the document NODE and
+    // therefore delegated events won't be fired
+    if (!clicked)
+    event.stopPropagation();
+  if (!clicked2)
+    event.stopPropagation();
+});
+</script>
+>>>>>>> Stashed changes
 </div>
 </body>
 </html>
