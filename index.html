@@ -31,8 +31,8 @@
       .container-narrow > hr {
         margin: 40px;
       }
-      #bitch {
-        color: #ffffff;
+      #projet{
+        color: #468499;
         text-decoration:none;
       }
       #viz {
@@ -41,12 +41,6 @@
         float: both;
       }
       
-      #formulaire {
-        margin-top: 50px;
-        margin-left: 100px;
-        margin-right: 10px;
-        float: left;
-      }
   </style>
 </head>
 <body>
@@ -79,23 +73,22 @@
           </ul>
         </li>
     </ul>
-    <h2 class="text-muted" href="/"> <span class="glyphicon glyphicon-education" aria-hidden="true"> </span> Projet Final</h3>
+    <h3 class="text-muted"><a id="projet" href="/home"> <span class="glyphicon glyphicon-home" aria-hidden="true"> </span> Accueil</a></h3>
     <hr>
-  <div id='formulaire'>
+    <div class="alert alert-danger" role="alert"> Oups ! Error 69   <span class="glyphicon glyphicon-retweet" aria-hidden="true"> </span>  le graphe is disconnected</div>
     <div id="matrice"></div>
     <div id="SSPT"></div>
     <div id= "MST"></div>
-  </div>
   <div id="viz"> </div>
   <script>
     var socket;
+    var matrice_adj; //Matrice d'adjacence
+    var debut;       //Point de départ du SSSP
+    var adjalist;    //Liste d'adjacence
+    var graphJSON;   //JSON du graphe
     var matrice = document.querySelector("#matrice");
-    var djistra;
-    var debut;
-    var adjalist;
-    var graphJSON;
-    var mst = document.querySelector("#MST");
     var sspt = document.querySelector("#SSPT");
+    var mst = document.querySelector("#MST");
     var viz = document.querySelector('#viz');
 
     function creerSocket() {
@@ -133,9 +126,10 @@
         }
       });
 
+      //Reçoit la matrice d'adjacence qui sera utilisé par Dijkstra
       socket.on ('matrix', function (data) {
-        djistra = data;
-        console.log(djistra);
+        matrice_adj = data;
+        console.log(matrice_adj);
       });
 
       //Reçoit le poids total du MST et l'affiche sur l'HTML et la console
@@ -155,6 +149,7 @@
         });
       });
 
+      //Reçoit le poids de chaque "shortest path" en tableau et l'affiche dans l'HTML
       socket.on ('dijkstra_output', function (data) {
         console.log (data);
         sspt.innerHTML = "<h3> Dijkstra :</h3>";
@@ -182,6 +177,7 @@
       socket.emit('input_value', s);
     }
 
+    //Calcul le SSSP selon le point de départ choisi par l'usager
     function service2() {
       //Check si le socket existe avant...
       if (typeof socket == 'undefined') {
@@ -189,7 +185,7 @@
         service2();
       }
       debut = document.querySelector("#start").value;
-      var input = [djistra, debut];
+      var input = [matrice_adj, debut];
       socket.emit('dijkstra', input);
     }
 
@@ -210,20 +206,20 @@
 
 
   </script>
-<script>
-var clicked = false;
-var clicked2 = false;
-$('#service1').click(function() { clicked = true });
-$('#service2').click(function() { clicked2 = true });
-$('ul.dropdown-menu').on('click', function(event){
-    // The event won't be propagated up to the document NODE and 
-    // therefore delegated events won't be fired
-    if (!clicked)
-    event.stopPropagation();
-  if (!clicked2)
-    event.stopPropagation();
-});
-</script>
+  <script>
+    var clicked = false;
+    var clicked2 = false;
+    $('#service1').click(function() { clicked = !clicked });
+    $('#service2').click(function() { clicked2 = !clicked2 });
+    $('ul.dropdown-menu').on('click', function(event){
+        // The event won't be propagated up to the document NODE and 
+        // therefore delegated events won't be fired
+        if (!clicked)
+          event.stopPropagation();
+        if (!clicked2)
+          event.stopPropagation();
+    });
+  </script>
 </div>
 </body>
 </html>
