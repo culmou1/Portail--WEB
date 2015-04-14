@@ -2,6 +2,6 @@
 
 Equipe :  Gillian Chaville, Samuel Laliberté, Daehli Nadeau-Otis & Julien Souvenir
 
-Pour demarer le serveur faire : node server.js
+Pour demarer le serveur : node server.js
 
 AMUSE TOI !!!!!
