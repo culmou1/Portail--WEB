@@ -4,7 +4,7 @@ Equipe :  Gillian Chaville, Samuel Laliberté, Daehli Nadeau-Otis & Julien Souve
 
 Gillian Chaville :
 
-Samuel Laliberté :
+Samuel Laliberté : LALS23069301
 
 Daehli Nadeau-Otis : NADD27099402
 
