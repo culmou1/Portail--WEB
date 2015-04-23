@@ -12,7 +12,7 @@ Julien Souvenir : SOUJ11098402
 
 Pour démarer le serveur : node server.js (Dans la console node ou dans le terminal)
 
-Nôtre serveur écoute sur le Port localhost:8070
+Notre serveur écoute sur le Port localhost:8070
 
 AMUSE TOI !!!!!
 
